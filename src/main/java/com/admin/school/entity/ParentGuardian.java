@@ -1,111 +1,32 @@
+// src/main/java/com/management/school/entity/ParentGuardian.java
 package com.admin.school.entity;
 
-import org.hibernate.annotations.GenericGenerator;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.List;
+
+import com.admin.school.data.AbstractEntity;
 
 @Entity
-public class ParentGuardian {
+public class ParentGuardian extends AbstractEntity {
 
-    // Custom ID generation strategy for the ParentGuardian entity with "PG" prefix
-    @Id
-    @GeneratedValue(generator = "guardian-id-gen")
-    @GenericGenerator(
-        name = "guardian-id-gen",
-        strategy ="com.admin.school.IDGenerator.CustomPrefixIdGenerator"
-    )
-    private String id;  // Auto-generated ID with "PG" prefix
+    private String name;
+    private String relationship;
+    private String phone;
+    private String address;
 
-    private String firstName;
-    private String middleName;
-    private String lastName;
-    private String nationalIdNumber;
-    private String phoneNumber;
-    private String emailAddress;
-    private String residence;
-    private String emergencyContact;
-    private String sourceOfIncome;
+    @OneToMany(mappedBy = "parentGuardian")
+    private List<Student> students;
 
-    // Getters and setters
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getNationalIdNumber() {
-        return nationalIdNumber;
-    }
-
-    public void setNationalIdNumber(String nationalIdNumber) {
-        this.nationalIdNumber = nationalIdNumber;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    public String getResidence() {
-        return residence;
-    }
-
-    public void setResidence(String residence) {
-        this.residence = residence;
-    }
-
-    public String getEmergencyContact() {
-        return emergencyContact;
-    }
-
-    public void setEmergencyContact(String emergencyContact) {
-        this.emergencyContact = emergencyContact;
-    }
-
-    public String getSourceOfIncome() {
-        return sourceOfIncome;
-    }
-
-    public void setSourceOfIncome(String sourceOfIncome) {
-        this.sourceOfIncome = sourceOfIncome;
-    }
+    // Getters and Setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getRelationship() { return relationship; }
+    public void setRelationship(String relationship) { this.relationship = relationship; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public List<Student> getStudents() { return students; }
+    public void setStudents(List<Student> students) { this.students = students; }
 }

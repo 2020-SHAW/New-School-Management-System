@@ -1,138 +1,120 @@
+// src/main/java/com/management/school/entity/Student.java
 package com.admin.school.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
-
+import jakarta.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
-import javax.swing.text.Document;
+import com.admin.school.data.AbstractEntity;
 
 @Entity
-public class Student {
+public class Student extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(generator = "student-id-gen")
-    @GenericGenerator(
-        name = "student-id-gen",
-        strategy = "com.admin.school.IDGenerator.CustomPrefixIdGenerator"
-    )
-    private String id;  // Auto-generated ID with "ST" prefix
-    
     private String firstName;
-    private String middleName;
     private String lastName;
-    private String otherNames;
 
-    private String sex;
+    @Email
+    private String email;
+
+    private String phone;
     private LocalDate dateOfBirth;
-    private int numberOfSiblings;
+    private String enrollmentStatus;
+    private String medicalCondition;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
-    private ClassEntity classEntity;
+    private Class assignedClass;
 
-    // One-to-many relationship with guardians
-    @OneToMany(cascade = CascadeType.ALL)  // A student can have multiple guardians
-    @JoinColumn(name = "student_id")  // This will reference the student ID in the ParentGuardian table
-    private List<ParentGuardian> guardians;
+    @ManyToOne
+    @JoinColumn(name = "parent_guardian_id")
+    private ParentGuardian parentGuardian;
 
-    @ElementCollection
-    private Set<byte[]> documentContents;
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DisciplinaryRecord> disciplinaryRecords;
 
-    // Getters and setters
+    @ManyToMany
+    @JoinTable(
+        name = "student_extracurricular",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "activity_id")
+    )
+    private List<ExtracurricularActivity> extracurricularActivities;
 
-    public String getId() {
-        return id;
-    }
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PerformanceAssessment performanceAssessment;
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
+    // Getters and Setters
     public String getFirstName() {
         return firstName;
     }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
     public String getLastName() {
         return lastName;
     }
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
-    public String getOtherNames() {
-        return otherNames;
+    public String getEmail() {
+        return email;
     }
-
-    public void setOtherNames(String otherNames) {
-        this.otherNames = otherNames;
+    public void setEmail(String email) {
+        this.email = email;
     }
-
-    public String getSex() {
-        return sex;
+    public String getPhone() {
+        return phone;
     }
-
-    public void setSex(String sex) {
-        this.sex = sex;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
-
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
-
-    public int getNumberOfSiblings() {
-        return numberOfSiblings;
+    public String getEnrollmentStatus() {
+        return enrollmentStatus;
     }
-
-    public void setNumberOfSiblings(int numberOfSiblings) {
-        this.numberOfSiblings = numberOfSiblings;
+    public void setEnrollmentStatus(String enrollmentStatus) {
+        this.enrollmentStatus = enrollmentStatus;
     }
-
-    public ClassEntity getClassEntity() {
-        return classEntity;
+    public String getMedicalCondition() {
+        return medicalCondition;
     }
-
-    public void setClassEntity(ClassEntity classEntity) {
-        this.classEntity = classEntity;
+    public void setMedicalCondition(String medicalCondition) {
+        this.medicalCondition = medicalCondition;
     }
-
-    public List<ParentGuardian> getGuardians() {
-        return guardians;
+    public Class getAssignedClass() {
+        return assignedClass;
     }
-
-    public void setGuardians(List<ParentGuardian> guardians) {
-        this.guardians = guardians;
+    public void setAssignedClass(Class assignedClass) {
+        this.assignedClass = assignedClass;
     }
-
-    public Set<Document> getDocuments() {
-        return getDocuments();
+    public ParentGuardian getParentGuardian() {
+        return parentGuardian;
     }
-
-    public void setDocuments(Set<byte[]> documents) {
-        this.documentContents = documents;
+    public void setParentGuardian(ParentGuardian parentGuardian) {
+        this.parentGuardian = parentGuardian;
     }
-
-    // You can add utility methods to add a guardian, if necessary
-    public void addGuardian(ParentGuardian guardian) {
-        this.guardians.add(guardian);
+    public List<DisciplinaryRecord> getDisciplinaryRecords() {
+        return disciplinaryRecords;
+    }
+    public void setDisciplinaryRecords(List<DisciplinaryRecord> disciplinaryRecords) {
+        this.disciplinaryRecords = disciplinaryRecords;
+    }
+    public List<ExtracurricularActivity> getExtracurricularActivities() {
+        return extracurricularActivities;
+    }
+    public void setExtracurricularActivities(List<ExtracurricularActivity> extracurricularActivities) {
+        this.extracurricularActivities = extracurricularActivities;
+    }
+    public PerformanceAssessment getPerformanceAssessment() {
+        return performanceAssessment;
+    }
+    public void setPerformanceAssessment(PerformanceAssessment performanceAssessment) {
+        this.performanceAssessment = performanceAssessment;
     }
 }

@@ -1,142 +1,32 @@
+// src/main/java/com/management/school/entity/Teacher.java
 package com.admin.school.entity;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 
-import java.time.LocalDate;
-import java.util.Set;
+import com.admin.school.data.AbstractEntity;
 
 @Entity
-public class Teacher {
+public class Teacher extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(generator = "teacher-id-gen")
-    @GenericGenerator(
-        name = "teacher-id-gen",
-        strategy = "com.admin.school.IDGenerator.CustomPrefixIdGenerator"
-    )
-    private String id; // Auto-generated ID with "TC" prefix
-
-    private String firstName;
-    private String middleName;
-    private String lastName;
+    private String name;
     private String subjectSpecialization;
-    private String kraPin;
-    private String residence;
-    private String maritalStatus;
-    private String sex;
-    private LocalDate dateOfBirth;
+    private String phone;
+    private String email;
 
-    @ElementCollection
-    private Set<byte[]> certifications;
+    @OneToMany(mappedBy = "teacher")
+    private List<PerformanceAssessment> performanceAssessments;
 
-    // Store file paths or URLs for files on disk
-    private String photoPath; // Path to image file (e.g., PNG, JPG)
-    private String resumePath; // Path to resume file (e.g., DOCX, PDF)
-
-    // Getters and setters
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getSubjectSpecialization() {
-        return subjectSpecialization;
-    }
-
-    public void setSubjectSpecialization(String subjectSpecialization) {
-        this.subjectSpecialization = subjectSpecialization;
-    }
-
-    public String getKraPin() {
-        return kraPin;
-    }
-
-    public void setKraPin(String kraPin) {
-        this.kraPin = kraPin;
-    }
-
-    public String getResidence() {
-        return residence;
-    }
-
-    public void setResidence(String residence) {
-        this.residence = residence;
-    }
-
-    public String getMaritalStatus() {
-        return maritalStatus;
-    }
-
-    public void setMaritalStatus(String maritalStatus) {
-        this.maritalStatus = maritalStatus;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public Set<byte[]> getCertifications() {
-        return certifications;
-    }
-
-    public void setCertifications(Set<byte[]> certifications) {
-        this.certifications = certifications;
-    }
-
-    public String getPhotoPath() {
-        return photoPath;
-    }
-
-    public void setPhotoPath(String photoPath) {
-        this.photoPath = photoPath;
-    }
-
-    public String getResumePath() {
-        return resumePath;
-    }
-
-    public void setResumePath(String resumePath) {
-        this.resumePath = resumePath;
-    }
+    // Getters and Setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getSubjectSpecialization() { return subjectSpecialization; }
+    public void setSubjectSpecialization(String subjectSpecialization) { this.subjectSpecialization = subjectSpecialization; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public List<PerformanceAssessment> getPerformanceAssessments() { return performanceAssessments; }
+    public void setPerformanceAssessments(List<PerformanceAssessment> performanceAssessments) { this.performanceAssessments = performanceAssessments; }
 }

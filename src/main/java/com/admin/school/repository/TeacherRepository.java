@@ -1,11 +1,11 @@
+// src/main/java/com/management/school/data/TeacherRepository.java
 package com.admin.school.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.admin.school.entity.Teacher;
 
-@Repository
-public interface TeacherRepository extends JpaRepository<Teacher, String> {
-    // No need for custom query methods unless needed
+public interface TeacherRepository
+        extends JpaRepository<Teacher, Long>, JpaSpecificationExecutor<Teacher> {
 }

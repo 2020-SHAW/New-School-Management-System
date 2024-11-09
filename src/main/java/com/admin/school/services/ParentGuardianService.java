@@ -1,9 +1,12 @@
+// src/main/java/com/management/school/services/ParentGuardianService.java
 package com.admin.school.services;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.admin.school.entity.ParentGuardian;
 import com.admin.school.repository.ParentGuardianRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,30 +14,42 @@ import java.util.Optional;
 @Service
 public class ParentGuardianService {
 
-    private final ParentGuardianRepository guardianRepository;
+    private final ParentGuardianRepository repository;
 
-    @Autowired
-    public ParentGuardianService(ParentGuardianRepository guardianRepository) {
-        this.guardianRepository = guardianRepository;
+    public ParentGuardianService(ParentGuardianRepository repository) {
+        this.repository = repository;
     }
 
-    // Create or Update a guardian
-    public ParentGuardian saveGuardian(ParentGuardian guardian) {
-        return guardianRepository.save(guardian);
+    public Optional<ParentGuardian> get(Long id) {
+        return repository.findById(id);
     }
 
-    // Find a guardian by ID
-    public Optional<ParentGuardian> getGuardianById(String guardianId) {
-        return guardianRepository.findById(guardianId);
+    public ParentGuardian save(ParentGuardian entity) {
+        return repository.save(entity);
     }
 
-    // Find all guardians
-    public List<ParentGuardian> getAllGuardians() {
-        return guardianRepository.findAll();
+    public ParentGuardian update(ParentGuardian entity) {
+        return repository.save(entity);
     }
 
-    // Delete a guardian by ID
-    public void deleteGuardian(String guardianId) {
-        guardianRepository.deleteById(guardianId);
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    public Page<ParentGuardian> list(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public Page<ParentGuardian> list(Pageable pageable, Specification<ParentGuardian> filter) {
+        return repository.findAll(filter, pageable);
+    }
+
+    public int count() {
+        return (int) repository.count();
+    }
+
+    // Method to retrieve all ParentGuardians for the dropdown in StudentView
+    public List<ParentGuardian> getAllParents() {
+        return repository.findAll();
     }
 }

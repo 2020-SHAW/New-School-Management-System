@@ -1,27 +1,29 @@
+// src/main/java/com/management/school/services/TeacherService.java
 package com.admin.school.services;
 
-import com.admin.school.data.User;
-import com.admin.school.data.UserRepository;
-import java.util.Optional;
+import com.admin.school.entity.Teacher;
+import com.admin.school.repository.TeacherRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
-public class UserService {
+public class TeacherService {
 
-    private final UserRepository repository;
+    private final TeacherRepository repository;
 
-    public UserService(UserRepository repository) {
+    public TeacherService(TeacherRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<User> get(Long id) {
+    public Optional<Teacher> get(Long id) {
         return repository.findById(id);
     }
 
-    public User update(User entity) {
+    public Teacher update(Teacher entity) {
         return repository.save(entity);
     }
 
@@ -29,16 +31,15 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public Page<User> list(Pageable pageable) {
+    public Page<Teacher> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    public Page<User> list(Pageable pageable, Specification<User> filter) {
+    public Page<Teacher> list(Pageable pageable, Specification<Teacher> filter) {
         return repository.findAll(filter, pageable);
     }
 
     public int count() {
         return (int) repository.count();
     }
-
 }

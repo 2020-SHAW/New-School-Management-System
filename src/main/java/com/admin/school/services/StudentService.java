@@ -1,11 +1,14 @@
+// src/main/java/com/management/school/services/StudentService.java
 package com.admin.school.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.admin.school.entity.ParentGuardian;
+import com.admin.school.entity.Class;
+import com.admin.school.repository.ClassRepository;
 import com.admin.school.entity.Student;
 import com.admin.school.repository.StudentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,42 +17,45 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final ClassRepository classRepository;
 
-    @Autowired
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, ClassRepository classRepository) {
         this.studentRepository = studentRepository;
+        this.classRepository = classRepository;
     }
 
-    // Create or Update a student
-    public Student saveStudent(Student student) {
-        return studentRepository.save(student);
+    public Optional<Student> get(Long id) {
+        return studentRepository.findById(id);
     }
 
-    // Find a student by ID
-    public Optional<Student> getStudentById(String studentId) {
-        return studentRepository.findById(studentId);
+    public Student save(Student entity) {
+        return studentRepository.save(entity);
     }
 
-    // Find all students
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public Student update(Student entity) {
+        return studentRepository.save(entity);
     }
 
-    // Delete a student by ID
-    public void deleteStudent(String studentId) {
-        studentRepository.deleteById(studentId);
+    public void delete(Long id) {
+        studentRepository.deleteById(id);
     }
 
-    // Add a guardian to a student
-    public void addGuardianToStudent(String studentId, ParentGuardian guardian) {
-        Optional<Student> studentOpt = studentRepository.findById(studentId);
-        if (studentOpt.isPresent()) {
-            Student student = studentOpt.get();
-            student.addGuardian(guardian);  // Add the guardian to the student's list of guardians
-            studentRepository.save(student);  // Save the student (which will also save the guardian)
-        } else {
-            throw new IllegalArgumentException("Student not found with id: " + studentId);
-        }
+    public Page<Student> list(Pageable pageable) {
+        return studentRepository.findAll(pageable);
     }
+
+    public Page<Student> list(Pageable pageable, Specification<Student> filter) {
+        return studentRepository.findAll(filter, pageable);
+    }
+
+    public int count() {
+        return (int) studentRepository.count();
+    }
+
+    // Method to retrieve all classes for the dropdown in StudentView
+    public List<Class> getAllClasses() {
+        return classRepository.findAll();
+    }
+    
+
 }
-
