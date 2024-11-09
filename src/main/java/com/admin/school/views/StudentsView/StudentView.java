@@ -24,7 +24,7 @@ import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Admit Student")
 @Route("student")
-@Menu(order = 6, icon = "line-awesome/svg/credit-card.svg")
+@Menu(order = 12, icon = "line-awesome/svg/credit-card.svg")
 @RolesAllowed("USER")
 public class StudentView extends VerticalLayout {
 
