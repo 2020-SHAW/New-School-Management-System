@@ -1,4 +1,3 @@
-// src/main/java/com/management/school/services/ClassService.java
 package com.admin.school.services;
 
 import com.admin.school.entity.Class;
@@ -28,6 +27,7 @@ public class ClassService {
     public Class save(Class entity) {
         return repository.save(entity);
     }
+
     public Class update(Class entity) {
         return repository.save(entity);
     }

@@ -1,135 +1,116 @@
 package com.admin.school.views.StudentsView;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import com.admin.school.entity.ClassEntity;
-import com.admin.school.entity.ParentGuardian;
 import com.admin.school.entity.Student;
-import com.admin.school.services.ParentGuardianService;
+import com.admin.school.services.ClassService;
 import com.admin.school.services.StudentService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.combobox.ComboBox;  // Import ComboBox
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
 
-@PageTitle("Admit Student")
-@Route("student")
-@Menu(order = 12, icon = "line-awesome/svg/credit-card.svg")
+@PageTitle("Student Admission")
+@Menu(order = 12, icon = "line-awesome/svg/th-solid.svg")
 @RolesAllowed("USER")
+@Route("student")
 public class StudentView extends VerticalLayout {
 
     private final StudentService studentService;
-    private final ParentGuardianService guardianService;
+    private final ClassService classService;
+    private final Binder<Student> binder = new Binder<>(Student.class);
 
-    // Inject dependencies
-    @Autowired
-    public StudentView(StudentService studentService, ParentGuardianService guardianService) {
+    private final TextField firstName = new TextField("First Name");
+    private final TextField middleName = new TextField("Middle Name");
+    private final TextField lastName = new TextField("Last Name");
+
+    // Use ComboBox for sex
+    private final ComboBox<String> sex = new ComboBox<>("Sex");
+    
+    private final DatePicker dateOfBirth = new DatePicker("Date of Birth");
+
+    // Use NumberField with Integer type for number of siblings
+    private final NumberField numberOfSiblings = new NumberField("Number of Siblings");
+
+    private final Upload birthCertificateUpload;
+    private final Upload medicalReportUpload;
+    private final Upload resultSlipUpload;
+
+    private final Button saveButton = new Button("Save", event -> saveStudent());
+
+    private final Grid<Student> grid = new Grid<>(Student.class);
+
+    public StudentView(StudentService studentService, ClassService classService) {
         this.studentService = studentService;
-        this.guardianService = guardianService;
+        this.classService = classService;
 
-        // Create the title
-        H1 title = new H1("Student Details");
+        // Initialize uploads
+        birthCertificateUpload = createDocumentUpload("Birth Certificate");
+        medicalReportUpload = createDocumentUpload("Medical Report");
+        resultSlipUpload = createDocumentUpload("Result Slip");
 
-        // Create TextFields for Student Info (editable)
-        TextField firstNameField = new TextField("First Name");
-        TextField middleNameField = new TextField("Middle Name");
-        TextField lastNameField = new TextField("Last Name");
-        TextField otherNamesField = new TextField("Other Names");
-        
-        Select<String> sexField = new Select<>();
-        sexField.setLabel("Sex");
-        sexField.setItems("Male", "Female");
-        
-        DatePicker dateOfBirthField = new DatePicker("Date of Birth");
-        NumberField numberOfSiblingsField = new NumberField("Number of Siblings");
-        
-        // Class entity (Assume we have a list of class names or IDs)
-        Select<ClassEntity> classEntitySelect = new Select<>();
-        classEntitySelect.setLabel("Class");
-        // Assume you have a method in the service to fetch all classes
-        // classEntitySelect.setItems(studentService.getAllClasses()); 
-        
-        // Display the student ID, but as read-only
-        TextField idField = new TextField("Student ID");
-        idField.setReadOnly(true); // The Student ID should be displayed but not editable
+        configureForm();
+        configureGrid();
 
-        // Button to save student details
-        Button saveButton = new Button("Save");
-        saveButton.addClickListener(e -> {
-            // Collect data and save student
-            Student student = new Student();
-            student.setFirstName(firstNameField.getValue());
-            student.setMiddleName(middleNameField.getValue());
-            student.setLastName(lastNameField.getValue());
-            student.setOtherNames(otherNamesField.getValue());
-            student.setSex(sexField.getValue());
-            student.setDateOfBirth(dateOfBirthField.getValue());
-            student.setNumberOfSiblings(numberOfSiblingsField.getValue() != null ? numberOfSiblingsField.getValue().intValue() : 0);
-            student.setClassEntity(classEntitySelect.getValue());
+        add(new HorizontalLayout(firstName, middleName, lastName, sex, dateOfBirth, numberOfSiblings),
+                birthCertificateUpload, medicalReportUpload, resultSlipUpload, saveButton, grid);
+    }
 
-            studentService.saveStudent(student);
+    private Upload createDocumentUpload(String label) {
+        MemoryBuffer buffer = new MemoryBuffer();
+        Upload upload = new Upload(buffer);
+        upload.setAcceptedFileTypes("application/pdf");
+        upload.setMaxFiles(1);
+        upload.setUploadButton(new Button("Upload " + label));
+        return upload;
+    }
 
-            Notification successNotification = Notification.show("Student saved successfully.");
-            successNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            successNotification.setPosition(Notification.Position.MIDDLE);
-        });
+    private void configureForm() {
+        // Configure the ComboBox for sex with two options
+        sex.setItems("Male", "Female");  // Set available options
+        sex.setRequired(true);  // Make it a required field
 
-        // TextFields for Guardian Info (For adding guardians)
-        TextField guardianFirstName = new TextField("Guardian First Name");
-        TextField guardianLastName = new TextField("Guardian Last Name");
+        // Bind fields directly without any converter since numberOfSiblings is an int
+        binder.forField(numberOfSiblings)
+            .withConverter(
+                value -> value != null ? value.intValue() : 0,  // If null, return 0
+                value -> (double) value)  // Convert int to double for NumberField
+            .bind(Student::getNumberOfSiblings, Student::setNumberOfSiblings);
 
-        Button addGuardianButton = new Button("Add Guardian");
+        // Automatically bind other fields
+        binder.bindInstanceFields(this);
+        binder.setBean(new Student()); // Bind to a new Student bean
+    }
 
-        addGuardianButton.addClickListener(e -> {
-            String studentId = idField.getValue();
+    private void configureGrid() {
+        grid.setColumns("id", "firstName", "lastName", "sex", "dateOfBirth");
+        grid.setItems(studentService.getAllStudents());
+        grid.asSingleSelect().addValueChangeListener(event -> populateForm(event.getValue()));
+    }
 
-            if (studentId != null && !studentId.isEmpty()) {
-                // Retrieve the Student from the database using the Student ID
-                Student student = studentService.getStudentById(studentId).orElse(null);
+    private void populateForm(Student student) {
+        binder.setBean(student != null ? student : new Student());
+    }
 
-                if (student != null) {
-                    ParentGuardian newGuardian = new ParentGuardian();
-                    newGuardian.setFirstName(guardianFirstName.getValue());
-                    newGuardian.setLastName(guardianLastName.getValue());
-                    guardianService.saveGuardian(newGuardian);
+    private void saveStudent() {
+        Student student = binder.getBean();
+        studentService.saveStudent(student);
+        Notification.show("Student saved successfully!");
+        refreshGrid();
+    }
 
-                    // Add the new guardian to the student's guardians list
-                    student.addGuardian(newGuardian);
-                    studentService.saveStudent(student);
-
-                    // Clear the input fields for guardian
-                    guardianFirstName.clear();
-                    guardianLastName.clear();
-
-                    Notification successNotification = Notification.show("Guardian added successfully.");
-                    successNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                    successNotification.setPosition(Notification.Position.MIDDLE);
-                } else {
-                    Notification errorNotification = Notification.show("Student not found.");
-                    errorNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    errorNotification.setPosition(Notification.Position.MIDDLE);
-                }
-            }
-        });
-
-        // Horizontal Layout for Student Information
-        HorizontalLayout studentInfoLayout = new HorizontalLayout(idField, firstNameField, middleNameField, lastNameField, otherNamesField);
-        HorizontalLayout studentAdditionalInfoLayout = new HorizontalLayout(sexField, dateOfBirthField, numberOfSiblingsField, classEntitySelect);
-        
-        // Horizontal Layout for Guardian Info
-        HorizontalLayout guardianInfoLayout = new HorizontalLayout(guardianFirstName, guardianLastName);
-
-        // Add all components to the layout
-        add(title, studentInfoLayout, studentAdditionalInfoLayout, saveButton, guardianInfoLayout, addGuardianButton);
+    private void refreshGrid() {
+        grid.setItems(studentService.getAllStudents());
     }
 }
