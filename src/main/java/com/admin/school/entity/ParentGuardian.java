@@ -13,7 +13,7 @@ public class ParentGuardian {
     @GeneratedValue(generator = "guardian-id-gen")
     @GenericGenerator(
         name = "guardian-id-gen",
-        strategy ="com.management.school.CustomGenerator.CustomPrefixIdGenerator"
+        strategy ="com.admin.school.IDGenerator.CustomPrefixIdGenerator"
     )
     private String id;  // Auto-generated ID with "PG" prefix
 

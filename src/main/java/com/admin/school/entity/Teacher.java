@@ -13,7 +13,7 @@ public class Teacher {
     @GeneratedValue(generator = "teacher-id-gen")
     @GenericGenerator(
         name = "teacher-id-gen",
-        strategy = "com.management.school.CustomGenerator.CustomPrefixIdGenerator"
+        strategy = "com.admin.school.IDGenerator.CustomPrefixIdGenerator"
     )
     private String id; // Auto-generated ID with "TC" prefix
 

@@ -1,6 +1,5 @@
 package com.admin.school.IDGenerator;
 
-
 import java.io.Serializable;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
@@ -11,9 +10,9 @@ public class CustomPrefixIdGenerator implements IdentifierGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) {
         String prefix = "";
-        String query = "";
         String entityName = "";
 
+        // Set prefix and entityName based on the type of the object
         if (object instanceof com.admin.school.entity.Student) {
             prefix = "ST";
             entityName = "Student";
@@ -25,7 +24,7 @@ public class CustomPrefixIdGenerator implements IdentifierGenerator {
             entityName = "ParentGuardian";
         }
 
-        // Use the session to fetch the count of records for the entity type
+        // Use HQL to fetch the count of records for the specific entity type
         String hql = "SELECT COUNT(e) FROM " + entityName + " e";
         Query<Long> countQuery = session.createQuery(hql, Long.class);
         Long count = countQuery.uniqueResult();  // Get the count of records

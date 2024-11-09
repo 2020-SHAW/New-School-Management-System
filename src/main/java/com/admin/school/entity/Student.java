@@ -16,7 +16,7 @@ public class Student {
     @GeneratedValue(generator = "student-id-gen")
     @GenericGenerator(
         name = "student-id-gen",
-        strategy = "com.management.school.CustomGenerator.CustomPrefixIdGenerator"
+        strategy = "com.admin.school.IDGenerator.CustomPrefixIdGenerator"
     )
     private String id;  // Auto-generated ID with "ST" prefix
     
