@@ -12,8 +12,9 @@ public class Student extends AbstractEntity {
 
     private String firstName;
     private String lastName;
+    private String sex;
 
-    @Email
+	@Email
     private String email;
 
     private String phone;
@@ -47,7 +48,9 @@ public class Student extends AbstractEntity {
     private PerformanceAssessment performanceAssessment;
 
     // Getters and Setters
-
+    public String getSex() {
+		return sex;
+	}
     public String getFirstName() {
         return firstName;
     }
@@ -151,4 +154,10 @@ public class Student extends AbstractEntity {
     public void setPerformanceAssessment(PerformanceAssessment performanceAssessment) {
         this.performanceAssessment = performanceAssessment;
     }
+
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
 }
