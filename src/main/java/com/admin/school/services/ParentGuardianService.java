@@ -3,6 +3,8 @@ package com.admin.school.services;
 
 import com.admin.school.entity.ParentGuardian;
 import com.admin.school.repository.ParentGuardianRepository;
+import com.vaadin.flow.data.provider.DataProvider;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -52,4 +54,9 @@ public class ParentGuardianService {
     public List<ParentGuardian> getAllParents() {
         return repository.findAll();
     }
+
+	public DataProvider<ParentGuardian, Void> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -51,7 +51,7 @@ public class ParentGuardianView extends VerticalLayout {
 
     private void configureGrid() {
         grid.setColumns("id", "firstName", "lastName", "phoneNumber", "emailAddress", "residence");
-        grid.setItems(guardianService.getAllGuardians());
+        grid.setItems(guardianService.findAll());
         grid.asSingleSelect().addValueChangeListener(event -> populateForm(event.getValue()));
     }
 
@@ -61,12 +61,12 @@ public class ParentGuardianView extends VerticalLayout {
 
     private void saveGuardian() {
         ParentGuardian guardian = binder.getBean();
-        guardianService.saveGuardian(guardian);
+        guardianService.save(guardian);
         Notification.show("Guardian saved successfully!");
         refreshGrid();
     }
 
     private void refreshGrid() {
-        grid.setItems(guardianService.getAllGuardians());
+        grid.setItems(guardianService.findAll());
     }
 }

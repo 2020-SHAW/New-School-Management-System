@@ -10,7 +10,19 @@ public class Health {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String condition;
+    public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public Student getStudent() {
+		return student;
+	}
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+	private String condition;
 
     @ManyToOne // Foreign key to Student
     @JoinColumn(name = "student_id")

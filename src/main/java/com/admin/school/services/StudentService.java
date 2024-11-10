@@ -1,4 +1,3 @@
-// src/main/java/com/management/school/services/StudentService.java
 package com.admin.school.services;
 
 import com.admin.school.entity.Class;
@@ -36,6 +35,14 @@ public class StudentService {
         return studentRepository.save(entity);
     }
 
+    public StudentRepository getStudentRepository() {
+        return studentRepository;
+    }
+
+    public ClassRepository getClassRepository() {
+        return classRepository;
+    }
+
     public void delete(Long id) {
         studentRepository.deleteById(id);
     }
@@ -52,10 +59,13 @@ public class StudentService {
         return (int) studentRepository.count();
     }
 
+    // Method to retrieve all students
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();  // Fetch all students from the repository
+    }
+
     // Method to retrieve all classes for the dropdown in StudentView
     public List<Class> getAllClasses() {
         return classRepository.findAll();
     }
-    
-
 }

@@ -19,7 +19,19 @@ public class Finance {
  
     // Getters and Setters
     
-    public double getAmountDue() {
+    public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public Student getStudent() {
+		return student;
+	}
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+	public double getAmountDue() {
     	return amountDue;
     }
     public void setAmountDue(double amountDue) {

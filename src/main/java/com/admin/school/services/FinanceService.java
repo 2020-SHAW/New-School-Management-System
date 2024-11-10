@@ -5,6 +5,7 @@ import com.admin.school.entity.Finance;
 import com.admin.school.repository.FinanceRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,15 +17,23 @@ public class FinanceService {
         this.repository = repository;
     }
 
+    // Get a specific finance record by ID
     public Optional<Finance> get(Long id) {
         return repository.findById(id);
     }
 
+    // Save a new finance record or update an existing one
     public Finance save(Finance finance) {
         return repository.save(finance);
     }
 
+    // Delete a finance record by ID
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    // List all finance records
+    public List<Finance> listAll() {
+        return repository.findAll();  // Retrieves all finance records from the database
     }
 }

@@ -1,4 +1,3 @@
-// src/main/java/com/management/school/entity/Student.java
 package com.admin.school.entity;
 
 import jakarta.persistence.*;
@@ -21,6 +20,9 @@ public class Student extends AbstractEntity {
     private LocalDate dateOfBirth;
     private String enrollmentStatus;
     private String medicalCondition;
+
+    // New field for number of siblings
+    private Integer numberOfSiblings;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
@@ -45,75 +47,107 @@ public class Student extends AbstractEntity {
     private PerformanceAssessment performanceAssessment;
 
     // Getters and Setters
+
     public String getFirstName() {
         return firstName;
     }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
+
     public String getLastName() {
         return lastName;
     }
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getPhone() {
         return phone;
     }
+
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
+
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+
     public String getEnrollmentStatus() {
         return enrollmentStatus;
     }
+
     public void setEnrollmentStatus(String enrollmentStatus) {
         this.enrollmentStatus = enrollmentStatus;
     }
+
     public String getMedicalCondition() {
         return medicalCondition;
     }
+
     public void setMedicalCondition(String medicalCondition) {
         this.medicalCondition = medicalCondition;
     }
+
+    public Integer getNumberOfSiblings() {
+        return numberOfSiblings;
+    }
+
+    public void setNumberOfSiblings(Integer numberOfSiblings) {
+        this.numberOfSiblings = numberOfSiblings;
+    }
+
     public Class getAssignedClass() {
         return assignedClass;
     }
+
     public void setAssignedClass(Class assignedClass) {
         this.assignedClass = assignedClass;
     }
+
     public ParentGuardian getParentGuardian() {
         return parentGuardian;
     }
+
     public void setParentGuardian(ParentGuardian parentGuardian) {
         this.parentGuardian = parentGuardian;
     }
+
     public List<DisciplinaryRecord> getDisciplinaryRecords() {
         return disciplinaryRecords;
     }
+
     public void setDisciplinaryRecords(List<DisciplinaryRecord> disciplinaryRecords) {
         this.disciplinaryRecords = disciplinaryRecords;
     }
+
     public List<ExtracurricularActivity> getExtracurricularActivities() {
         return extracurricularActivities;
     }
+
     public void setExtracurricularActivities(List<ExtracurricularActivity> extracurricularActivities) {
         this.extracurricularActivities = extracurricularActivities;
     }
+
     public PerformanceAssessment getPerformanceAssessment() {
         return performanceAssessment;
     }
+
     public void setPerformanceAssessment(PerformanceAssessment performanceAssessment) {
         this.performanceAssessment = performanceAssessment;
     }

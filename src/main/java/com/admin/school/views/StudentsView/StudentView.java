@@ -9,9 +9,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.combobox.ComboBox;  // Import ComboBox
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
@@ -35,13 +34,11 @@ public class StudentView extends VerticalLayout {
     private final TextField middleName = new TextField("Middle Name");
     private final TextField lastName = new TextField("Last Name");
 
-    // Use ComboBox for sex
     private final ComboBox<String> sex = new ComboBox<>("Sex");
-    
+
     private final DatePicker dateOfBirth = new DatePicker("Date of Birth");
 
-    // Use NumberField with Integer type for number of siblings
-    private final NumberField numberOfSiblings = new NumberField("Number of Siblings");
+    private final TextField numberOfSiblings = new TextField("Number of Siblings");
 
     private final Upload birthCertificateUpload;
     private final Upload medicalReportUpload;
@@ -81,12 +78,18 @@ public class StudentView extends VerticalLayout {
         sex.setItems("Male", "Female");  // Set available options
         sex.setRequired(true);  // Make it a required field
 
-        // Bind fields directly without any converter since numberOfSiblings is an int
+        // Set pattern for numberOfSiblings TextField to accept only digits
+        numberOfSiblings.setPattern("\\d*");  // Only allow digits (0-9)
+        numberOfSiblings.setErrorMessage("Please enter a valid integer");
+        
+        // Bind the TextField to the numberOfSiblings field in the Student entity
         binder.forField(numberOfSiblings)
-            .withConverter(
-                value -> value != null ? value.intValue() : 0,  // If null, return 0
-                value -> (double) value)  // Convert int to double for NumberField
-            .bind(Student::getNumberOfSiblings, Student::setNumberOfSiblings);
+                .withConverter(
+                        value -> value.isEmpty() ? null : Integer.valueOf(value),  // Convert String to Integer
+                        value -> value == null ? "" : value.toString()  // Convert Integer to String
+                )
+                .withValidator(value -> value == null || value >= 0, "Number of siblings must be a non-negative integer")
+                .bind(Student::getNumberOfSiblings, Student::setNumberOfSiblings);
 
         // Automatically bind other fields
         binder.bindInstanceFields(this);
@@ -95,7 +98,7 @@ public class StudentView extends VerticalLayout {
 
     private void configureGrid() {
         grid.setColumns("id", "firstName", "lastName", "sex", "dateOfBirth");
-        grid.setItems(studentService.getAllStudents());
+        grid.setItems(studentService.getAllStudents()); // Fetch all students using the new method
         grid.asSingleSelect().addValueChangeListener(event -> populateForm(event.getValue()));
     }
 
@@ -105,12 +108,12 @@ public class StudentView extends VerticalLayout {
 
     private void saveStudent() {
         Student student = binder.getBean();
-        studentService.saveStudent(student);
+        studentService.save(student);
         Notification.show("Student saved successfully!");
         refreshGrid();
     }
 
     private void refreshGrid() {
-        grid.setItems(studentService.getAllStudents());
+        grid.setItems(studentService.getAllStudents()); // Refresh grid after saving
     }
 }

@@ -5,6 +5,7 @@ import com.admin.school.entity.Health;
 import com.admin.school.repository.HealthRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,5 +27,9 @@ public class HealthService {
 
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    public List<Health> listAll() {
+        return repository.findAll();  // Assuming this is the default list operation
     }
 }
