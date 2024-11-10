@@ -1,4 +1,3 @@
-// src/main/java/com/admin/school/controller/ParentGuardianController.java
 package com.admin.school.controller;
 
 import com.admin.school.entity.ParentGuardian;
@@ -26,7 +25,7 @@ public class ParentGuardianController {
     // GET all parents with pagination
     @GetMapping
     public ResponseEntity<Page<ParentGuardian>> getAllParents(Pageable pageable) {
-        Page<ParentGuardian> parents = parentGuardianService.list(pageable);
+        Page<ParentGuardian> parents = parentGuardianService.list(pageable, null); // Use null for no filter
         return new ResponseEntity<>(parents, HttpStatus.OK);
     }
 
@@ -45,9 +44,12 @@ public class ParentGuardianController {
                      .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    // POST - create a new parent
+    // POST - create a new parent with validation for student
     @PostMapping
     public ResponseEntity<ParentGuardian> createParent(@RequestBody ParentGuardian parentGuardian) {
+        if (parentGuardian.getStudents() == null || parentGuardian.getStudents().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Student must be linked
+        }
         ParentGuardian savedParent = parentGuardianService.save(parentGuardian);
         return new ResponseEntity<>(savedParent, HttpStatus.CREATED);
     }
@@ -55,10 +57,12 @@ public class ParentGuardianController {
     // PUT - update an existing parent
     @PutMapping("/{id}")
     public ResponseEntity<ParentGuardian> updateParent(@PathVariable Long id, @RequestBody ParentGuardian parentGuardian) {
-        // Ensure the parent exists before updating
         Optional<ParentGuardian> existingParent = parentGuardianService.get(id);
         if (existingParent.isPresent()) {
-            parentGuardian.setId(id); // Ensure the ID is set for updating
+            parentGuardian.setId(id);
+            if (parentGuardian.getStudents() == null || parentGuardian.getStudents().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
             ParentGuardian updatedParent = parentGuardianService.update(parentGuardian);
             return new ResponseEntity<>(updatedParent, HttpStatus.OK);
         } else {
@@ -88,7 +92,7 @@ public class ParentGuardianController {
     // GET count of all parents
     @GetMapping("/count")
     public ResponseEntity<Integer> getParentCount() {
-        int count = parentGuardianService.count();
-        return new ResponseEntity<>(count, HttpStatus.OK);
+        long count = parentGuardianService.count();
+        return new ResponseEntity<>(Math.toIntExact(count), HttpStatus.OK); // Convert long to int
     }
 }

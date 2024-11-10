@@ -1,10 +1,7 @@
-// src/main/java/com/management/school/services/ParentGuardianService.java
 package com.admin.school.services;
 
 import com.admin.school.entity.ParentGuardian;
 import com.admin.school.repository.ParentGuardianRepository;
-import com.vaadin.flow.data.provider.DataProvider;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,25 +35,21 @@ public class ParentGuardianService {
         repository.deleteById(id);
     }
 
-    public Page<ParentGuardian> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public List<ParentGuardian> findAll() {
+        return repository.findAll();
     }
 
-    public Page<ParentGuardian> list(Pageable pageable, Specification<ParentGuardian> filter) {
-        return repository.findAll(filter, pageable);
-    }
-
-    public int count() {
-        return (int) repository.count();
-    }
-
-    // Method to retrieve all ParentGuardians for the dropdown in StudentView
     public List<ParentGuardian> getAllParents() {
         return repository.findAll();
     }
 
-	public DataProvider<ParentGuardian, Void> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    // List with pagination and filtering (Specification)
+    public Page<ParentGuardian> list(Pageable pageable, Specification<ParentGuardian> specification) {
+        return repository.findAll(specification, pageable);
+    }
+
+    // Count total number of ParentGuardian entities
+    public long count() {
+        return repository.count();
+    }
 }
