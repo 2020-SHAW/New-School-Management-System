@@ -5,16 +5,18 @@ import jakarta.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.admin.school.data.AbstractEntity;
-
 @Entity
-public class Student extends AbstractEntity {
+public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-generate the ID
+    private Long id;  // Primary Key
 
     private String firstName;
     private String lastName;
     private String sex;
 
-	@Email
+    @Email
     private String email;
 
     private String phone;
@@ -48,9 +50,14 @@ public class Student extends AbstractEntity {
     private PerformanceAssessment performanceAssessment;
 
     // Getters and Setters
-    public String getSex() {
-		return sex;
-	}
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -65,6 +72,14 @@ public class Student extends AbstractEntity {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
     }
 
     public String getEmail() {
@@ -154,10 +169,4 @@ public class Student extends AbstractEntity {
     public void setPerformanceAssessment(PerformanceAssessment performanceAssessment) {
         this.performanceAssessment = performanceAssessment;
     }
-
-
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-
 }

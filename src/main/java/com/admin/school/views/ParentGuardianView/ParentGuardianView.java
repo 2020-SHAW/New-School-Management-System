@@ -17,6 +17,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.Text;
 
 import jakarta.annotation.security.RolesAllowed;
 
@@ -42,6 +43,9 @@ public class ParentGuardianView extends VerticalLayout {
     // Grid to display both student and guardian details
     private Grid<Student> studentGrid;
 
+    // Grid to display guardian details
+    private Grid<ParentGuardian> guardianGrid;
+
     @Autowired
     public ParentGuardianView(ParentGuardianService parentGuardianService, StudentService studentService) {
         this.parentGuardianService = parentGuardianService;
@@ -55,6 +59,13 @@ public class ParentGuardianView extends VerticalLayout {
         emailField = new TextField("Guardian Email");
         relationshipComboBox = new ComboBox<>("Relationship", "Mother", "Father", "Other");
         customRelationshipField = new TextField("Custom Relationship");
+
+        // Make all fields required
+        firstNameField.setRequired(true);
+        lastNameField.setRequired(true);
+        phoneField.setRequired(true);
+        emailField.setRequired(true);
+        relationshipComboBox.setRequired(true);
 
         customRelationshipField.setVisible(false);  // Initially hidden
 
@@ -79,13 +90,61 @@ public class ParentGuardianView extends VerticalLayout {
 
         studentGrid.setHeight("200px");  // Set a fixed height for the grid
 
+        // Create Grid to display guardian details
+        guardianGrid = new Grid<>();
+        guardianGrid.addColumn(ParentGuardian::getFirstName).setHeader("Guardian First Name");
+        guardianGrid.addColumn(ParentGuardian::getLastName).setHeader("Guardian Last Name");
+        guardianGrid.addColumn(ParentGuardian::getPhoneNumber).setHeader("Phone Number");
+        guardianGrid.addColumn(ParentGuardian::getEmail).setHeader("Email");
+        guardianGrid.addColumn(ParentGuardian::getRelationship).setHeader("Relationship");
+        guardianGrid.setHeight("200px");
+
         // Add components to layout
-        add(studentIdField, studentGrid, firstNameField, lastNameField, phoneField, emailField, relationshipComboBox, customRelationshipField, saveButton);
+        add(studentIdField, studentGrid, firstNameField, lastNameField, phoneField, emailField, relationshipComboBox, customRelationshipField, saveButton, new Text("Guardian Details:"), guardianGrid);
 
         // Bind events
         studentIdField.addValueChangeListener(e -> searchStudentById(e.getValue()));
         studentIdField.setValueChangeMode(com.vaadin.flow.data.value.ValueChangeMode.EAGER); // Trigger search as the user types
         relationshipComboBox.addValueChangeListener(e -> handleRelationshipChange(e.getValue()));
+
+        // Validators
+        setValidators();
+    }
+
+    private void setValidators() {
+        // Validate first and last name to accept only letters
+        firstNameField.addValueChangeListener(e -> {
+            if (!e.getValue().matches("[a-zA-Z]+")) {
+                Notification.show("First name can only contain letters.");
+                firstNameField.clear();
+            }
+        });
+
+        lastNameField.addValueChangeListener(e -> {
+            if (!e.getValue().matches("[a-zA-Z]+")) {
+                Notification.show("Last name can only contain letters.");
+                lastNameField.clear();
+            }
+        });
+
+        // Validate phone number to accept only digits
+        phoneField.addValueChangeListener(e -> {
+            if (!e.getValue().matches("[0-9]+")) {
+                Notification.show("Phone number can only contain numbers.");
+                phoneField.clear();
+            }
+        });
+
+        // Email validation: must be a valid email and length <= 20
+        emailField.addValueChangeListener(e -> {
+            if (e.getValue().length() > 20) {
+                Notification.show("Email address must be 20 characters or less.");
+                emailField.clear();
+            } else if (!e.getValue().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                Notification.show("Please enter a valid email address.");
+                emailField.clear();
+            }
+        });
     }
 
     // Real-time search for student by ID
@@ -179,7 +238,7 @@ public class ParentGuardianView extends VerticalLayout {
         studentService.save(selectedStudent);
 
         // Refresh the grid with the new guardian details
-        studentGrid.getDataProvider().refreshAll();  // Refresh the grid to show updated guardian details
+        guardianGrid.setItems(List.of(parentGuardian));  // Show the added guardian in the guardian table
 
         Notification.show("Guardian saved successfully.");
     }
