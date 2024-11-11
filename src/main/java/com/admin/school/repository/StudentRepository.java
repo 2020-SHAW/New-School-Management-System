@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.admin.school.entity.Student;
 
 public interface StudentRepository
-        extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
+        extends JpaRepository<Student, String>, JpaSpecificationExecutor<Student> {
 
 }

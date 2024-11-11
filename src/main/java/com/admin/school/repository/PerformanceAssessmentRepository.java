@@ -8,5 +8,5 @@ import com.admin.school.entity.PerformanceAssessment;
 import java.util.Optional;
 
 public interface PerformanceAssessmentRepository extends JpaRepository<PerformanceAssessment, Long> {
-    Optional<PerformanceAssessment> findByStudentId(Long studentId);
+    Optional<PerformanceAssessment> findByStudentId(String studentId);  // <-- Change Long to String
 }

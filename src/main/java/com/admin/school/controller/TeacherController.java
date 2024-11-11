@@ -1,11 +1,7 @@
-// src/main/java/com/admin/school/controller/TeacherController.java
 package com.admin.school.controller;
 
 import com.admin.school.entity.Teacher;
 import com.admin.school.services.TeacherService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,21 +14,22 @@ public class TeacherController {
 
     private final TeacherService teacherService;
 
+    // Constructor-based injection for TeacherService
     public TeacherController(TeacherService teacherService) {
         this.teacherService = teacherService;
     }
 
-    // GET all teachers with pagination
+    // GET all teachers (pagination can be handled via Pageable in the service)
     @GetMapping
-    public ResponseEntity<Page<Teacher>> getAllTeachers(Pageable pageable) {
-        Page<Teacher> teachers = teacherService.list(pageable);
+    public ResponseEntity<Iterable<Teacher>> getAllTeachers() {
+        Iterable<Teacher> teachers = teacherService.getAllTeachers();
         return new ResponseEntity<>(teachers, HttpStatus.OK);
     }
 
-    // GET teacher by ID
+    // GET teacher by ID (ID is a String, as it is custom-generated)
     @GetMapping("/{id}")
-    public ResponseEntity<Teacher> getTeacherById(@PathVariable Long id) {
-        Optional<Teacher> teacher = teacherService.get(id);
+    public ResponseEntity<Teacher> getTeacherById(@PathVariable String id) {
+        Optional<Teacher> teacher = teacherService.getTeacherById(id);
         return teacher.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -40,18 +37,17 @@ public class TeacherController {
     // POST - create a new teacher
     @PostMapping
     public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) {
-        Teacher savedTeacher = teacherService.update(teacher);  // Using update here because save is similar in this case
+        Teacher savedTeacher = teacherService.createOrUpdateTeacher(teacher);  // Using createOrUpdate here as save logic
         return new ResponseEntity<>(savedTeacher, HttpStatus.CREATED);
     }
 
     // PUT - update an existing teacher
     @PutMapping("/{id}")
-    public ResponseEntity<Teacher> updateTeacher(@PathVariable Long id, @RequestBody Teacher teacher) {
-        // Ensure the teacher exists before updating
-        Optional<Teacher> existingTeacher = teacherService.get(id);
+    public ResponseEntity<Teacher> updateTeacher(@PathVariable String id, @RequestBody Teacher teacher) {
+        Optional<Teacher> existingTeacher = teacherService.getTeacherById(id);
         if (existingTeacher.isPresent()) {
-            teacher.setId(id); // Ensure the ID is set for updating
-            Teacher updatedTeacher = teacherService.update(teacher);
+            teacher.setId(id);  // Ensure the ID is set correctly for updating
+            Teacher updatedTeacher = teacherService.createOrUpdateTeacher(teacher);
             return new ResponseEntity<>(updatedTeacher, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -60,27 +56,20 @@ public class TeacherController {
 
     // DELETE - delete a teacher by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
-        Optional<Teacher> teacher = teacherService.get(id);
+    public ResponseEntity<Void> deleteTeacher(@PathVariable String id) {
+        Optional<Teacher> teacher = teacherService.getTeacherById(id);
         if (teacher.isPresent()) {
-            teacherService.delete(id);
+            teacherService.deleteTeacherById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    // GET all teachers with filtering and pagination (using Specification)
-    @GetMapping("/filter")
-    public ResponseEntity<Page<Teacher>> getFilteredTeachers(Pageable pageable, Specification<Teacher> specification) {
-        Page<Teacher> filteredTeachers = teacherService.list(pageable, specification);
-        return new ResponseEntity<>(filteredTeachers, HttpStatus.OK);
-    }
-
     // GET count of all teachers
     @GetMapping("/count")
-    public ResponseEntity<Integer> getTeacherCount() {
-        int count = teacherService.count();
+    public ResponseEntity<Long> getTeacherCount() {
+        long count = teacherService.getTeacherCount();
         return new ResponseEntity<>(count, HttpStatus.OK);
     }
 }

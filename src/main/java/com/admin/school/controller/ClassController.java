@@ -1,4 +1,3 @@
-// src/main/java/com/admin/school/controller/ClassController.java
 package com.admin.school.controller;
 
 import com.admin.school.entity.Class;
@@ -51,7 +50,7 @@ public class ClassController {
         Optional<Class> existingClass = classService.get(id);
         if (existingClass.isPresent()) {
             clazz.setId(id); // Ensure the ID is set for updating
-            Class updatedClass = classService.update(clazz);
+            Class updatedClass = classService.update(clazz);  // Call the update method here
             return new ResponseEntity<>(updatedClass, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -79,8 +78,8 @@ public class ClassController {
 
     // GET count of all classes
     @GetMapping("/count")
-    public ResponseEntity<Integer> getClassCount() {
-        int count = classService.count();
+    public ResponseEntity<Long> getClassCount() {
+        long count = classService.count();  // Return a long
         return new ResponseEntity<>(count, HttpStatus.OK);
     }
 }

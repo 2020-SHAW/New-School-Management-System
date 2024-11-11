@@ -1,45 +1,55 @@
-// src/main/java/com/management/school/services/TeacherService.java
 package com.admin.school.services;
 
 import com.admin.school.entity.Teacher;
 import com.admin.school.repository.TeacherRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TeacherService {
 
-    private final TeacherRepository repository;
-
-    public TeacherService(TeacherRepository repository) {
-        this.repository = repository;
+    private final TeacherRepository teacherRepository;
+    
+    public Page<Teacher> listTeachers(Pageable pageable) {
+        return teacherRepository.findAll(pageable);
     }
 
-    public Optional<Teacher> get(Long id) {
-        return repository.findById(id);
+    // Optionally, if you need to get all teachers without pagination
+    public List<Teacher> listAll() {
+        return teacherRepository.findAll();
     }
 
-    public Teacher update(Teacher entity) {
-        return repository.save(entity);
+    public TeacherService(TeacherRepository teacherRepository) {
+        this.teacherRepository = teacherRepository;
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
+    // Get all teachers
+    public Iterable<Teacher> getAllTeachers() {
+        return teacherRepository.findAll();
     }
 
-    public Page<Teacher> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    // Get teacher by ID
+    public Optional<Teacher> getTeacherById(String id) {
+        return teacherRepository.findById(id);
     }
 
-    public Page<Teacher> list(Pageable pageable, Specification<Teacher> filter) {
-        return repository.findAll(filter, pageable);
+    // Create or update teacher
+    public Teacher createOrUpdateTeacher(Teacher teacher) {
+        return teacherRepository.save(teacher);
     }
 
-    public int count() {
-        return (int) repository.count();
+    // Delete teacher by ID
+    public void deleteTeacherById(String id) {
+        teacherRepository.deleteById(id);
+    }
+
+    // Get count of teachers
+    public long getTeacherCount() {
+        return teacherRepository.count();
     }
 }

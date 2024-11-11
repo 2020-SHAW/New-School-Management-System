@@ -1,4 +1,3 @@
-// src/main/java/com/management/school/services/PerformanceAssessmentService.java
 package com.admin.school.services;
 
 import com.admin.school.entity.PerformanceAssessment;
@@ -22,7 +21,7 @@ public class PerformanceAssessmentService {
     }
 
     public Optional<PerformanceAssessment> getByStudentId(Long studentId) {
-        return repository.findByStudentId(studentId);
+        return repository.findById(studentId);
     }
 
     public PerformanceAssessment save(PerformanceAssessment performanceAssessment) {
@@ -32,9 +31,8 @@ public class PerformanceAssessmentService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
- // src/main/java/com/management/school/services/PerformanceAssessmentService.java
-    public List<PerformanceAssessment> listAll() {
-        return repository.findAll();  // Assuming your repository has a `findAll()` method
-    }
 
+    public List<PerformanceAssessment> listAll() {
+        return repository.findAll();
+    }
 }

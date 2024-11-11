@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.admin.school.entity.Teacher;
 
 public interface TeacherRepository
-        extends JpaRepository<Teacher, Long>, JpaSpecificationExecutor<Teacher> {
+        extends JpaRepository<Teacher, String>, JpaSpecificationExecutor<Teacher> {
 }

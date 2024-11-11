@@ -19,7 +19,7 @@ public class ParentGuardianService {
         this.repository = repository;
     }
 
-    public Optional<ParentGuardian> get(Long id) {
+    public Optional<ParentGuardian> get(String id) {
         return repository.findById(id);
     }
 
@@ -31,7 +31,7 @@ public class ParentGuardianService {
         return repository.save(entity);
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         repository.deleteById(id);
     }
 
@@ -45,10 +45,9 @@ public class ParentGuardianService {
 
     // List with pagination and filtering (Specification)
     public Page<ParentGuardian> list(Pageable pageable, Specification<ParentGuardian> specification) {
-        return repository.findAll(specification, pageable);
+        return repository.findAll(specification, pageable);  // This will now work correctly
     }
 
-    // Count total number of ParentGuardian entities
     public long count() {
         return repository.count();
     }

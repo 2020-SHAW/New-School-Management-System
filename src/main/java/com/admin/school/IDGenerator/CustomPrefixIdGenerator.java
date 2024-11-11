@@ -3,7 +3,7 @@ package com.admin.school.IDGenerator;
 import java.io.Serializable;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.query.Query;
+import org.hibernate.query.NativeQuery;
 
 public class CustomPrefixIdGenerator implements IdentifierGenerator {
 
@@ -24,12 +24,15 @@ public class CustomPrefixIdGenerator implements IdentifierGenerator {
             entityName = "ParentGuardian";
         }
 
-        // Use HQL to fetch the count of records for the specific entity type
-        String hql = "SELECT COUNT(e) FROM " + entityName + " e";
-        Query<Long> countQuery = session.createQuery(hql, Long.class);
-        Long count = countQuery.uniqueResult();  // Get the count of records
+        // Use a sequence to get the next ID. Dynamically choose the sequence name based on entity type.
+        String sequenceName = entityName.toLowerCase() + "_seq";  // Example: "student_seq" or "teacher_seq"
+        
+        // Create a native SQL query to fetch the next sequence value
+        String sql = "SELECT nextval('" + sequenceName + "')";
+        NativeQuery<Long> countQuery = session.createNativeQuery(sql, Long.class);
+        Long count = countQuery.uniqueResult();
 
-        // Generate the next ID by adding 1 to the count
-        return prefix + (count + 1);  // Prefix with incremented count
+        // Return the generated ID with the prefix, padded to 4 digits
+        return prefix + String.format("%04d", count);
     }
 }

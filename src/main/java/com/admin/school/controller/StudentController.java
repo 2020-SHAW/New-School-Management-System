@@ -40,7 +40,7 @@ public class StudentController {
 
     // GET student by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
+    public ResponseEntity<Student> getStudentById(@PathVariable String id) {
         Optional<Student> student = studentService.get(id);
         return student.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -49,33 +49,40 @@ public class StudentController {
     // POST - create a new student
     @PostMapping
     public ResponseEntity<Student> createStudent(@RequestBody Student student) {
+        // Ensure that required relationships (Class and ParentGuardian) are provided
+        if (student.getAssignedClass() == null || student.getParentGuardian() == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Bad request if relationships are not set
+        }
         Student savedStudent = studentService.save(student);
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
 
     // PUT - update an existing student
     @PutMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
-        // Ensure the student exists before updating
+    public ResponseEntity<Student> updateStudent(@PathVariable String id, @RequestBody Student student) {
         Optional<Student> existingStudent = studentService.get(id);
         if (existingStudent.isPresent()) {
-            student.setId(id); // Ensure the ID is set for updating
+            // Convert the Long ID to String before setting
+            student.setId(String.valueOf(id)); // Set the ID for the student to update
+            if (student.getAssignedClass() == null || student.getParentGuardian() == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Ensure relationships are set
+            }
             Student updatedStudent = studentService.update(student);
             return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Not found if the student doesn't exist
         }
     }
 
     // DELETE - delete a student by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStudent(@PathVariable String id) {
         Optional<Student> student = studentService.get(id);
         if (student.isPresent()) {
             studentService.delete(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // No content on successful deletion
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Not found if student doesn't exist
         }
     }
 

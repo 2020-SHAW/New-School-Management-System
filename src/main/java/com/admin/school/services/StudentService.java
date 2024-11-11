@@ -23,7 +23,8 @@ public class StudentService {
         this.classRepository = classRepository;
     }
 
-    public Optional<Student> get(Long id) {
+    // Updated to accept Long type ID instead of String
+    public Optional<Student> get(String id) {
         return studentRepository.findById(id);
     }
 
@@ -43,7 +44,8 @@ public class StudentService {
         return classRepository;
     }
 
-    public void delete(Long id) {
+    // Updated to accept Long type ID instead of String
+    public void delete(String id) {
         studentRepository.deleteById(id);
     }
 

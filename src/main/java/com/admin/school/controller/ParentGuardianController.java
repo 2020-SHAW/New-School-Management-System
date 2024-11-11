@@ -38,7 +38,7 @@ public class ParentGuardianController {
 
     // GET parent by ID
     @GetMapping("/{id}")
-    public ResponseEntity<ParentGuardian> getParentById(@PathVariable Long id) {
+    public ResponseEntity<ParentGuardian> getParentById(@PathVariable String id) {  // Use String here
         Optional<ParentGuardian> parent = parentGuardianService.get(id);
         return parent.map(ResponseEntity::ok)
                      .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -56,10 +56,10 @@ public class ParentGuardianController {
 
     // PUT - update an existing parent
     @PutMapping("/{id}")
-    public ResponseEntity<ParentGuardian> updateParent(@PathVariable Long id, @RequestBody ParentGuardian parentGuardian) {
+    public ResponseEntity<ParentGuardian> updateParent(@PathVariable String id, @RequestBody ParentGuardian parentGuardian) {  // Use String here
         Optional<ParentGuardian> existingParent = parentGuardianService.get(id);
         if (existingParent.isPresent()) {
-            parentGuardian.setId(id);
+            parentGuardian.setId(id);  // Ensure you pass the ID as String
             if (parentGuardian.getStudents() == null || parentGuardian.getStudents().isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -72,7 +72,7 @@ public class ParentGuardianController {
 
     // DELETE - delete a parent by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteParent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteParent(@PathVariable String id) {  // Use String here
         Optional<ParentGuardian> parent = parentGuardianService.get(id);
         if (parent.isPresent()) {
             parentGuardianService.delete(id);

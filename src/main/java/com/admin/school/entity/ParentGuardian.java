@@ -1,59 +1,35 @@
 package com.admin.school.entity;
 
+import com.admin.school.IDGenerator.CustomPrefixIdGenerator;
 import jakarta.persistence.*;
 import java.util.List;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity
-@Table(name = "parent_guardian")
 public class ParentGuardian {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // Primary Key
+    @GeneratedValue(generator = "custom-id-generator")
+    @GenericGenerator(name = "custom-id-generator", strategy = "com.admin.school.IDGenerator.CustomPrefixIdGenerator")
+    private String id;  // Primary Key
 
-    @Column(name = "first_name", nullable = false)
     private String firstName;
-
-    @Column(name = "middle_name")
-    private String middleName;
-
-    @Column(name = "last_name", nullable = false)
     private String lastName;
-
-    @Column(name = "relationship", nullable = false)
-    private String relationship;  // Relationship (Mother, Father, Other)
-
-    @Column(name = "phone_number", nullable = false)
+    private String relationship;
     private String phoneNumber;
-
-    @Column(name = "email", nullable = false)
     private String email;
-
-    @Column(name = "address")
     private String address;
 
     @OneToMany(mappedBy = "parentGuardian")
-    private List<Student> students;  // A ParentGuardian can have multiple students
-
-    // Constructors, Getters, and Setters
-    public ParentGuardian() {}
-
-    public ParentGuardian(String firstName, String middleName, String lastName, String relationship, String phoneNumber, String email, String address) {
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.relationship = relationship;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.address = address;
-    }
+    private List<Student> students;
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -63,14 +39,6 @@ public class ParentGuardian {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
     }
 
     public String getLastName() {

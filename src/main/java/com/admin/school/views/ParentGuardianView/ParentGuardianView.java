@@ -151,7 +151,7 @@ public class ParentGuardianView extends VerticalLayout {
     private void searchStudentById(String studentId) {
         if (studentId != null && !studentId.isEmpty()) {
             try {
-                Long id = Long.parseLong(studentId);  // Try to parse the ID
+                String id = studentId;  // Try to parse the ID
                 studentService.get(id).ifPresentOrElse(student -> {
                     selectedStudent = student;
                     displayStudentDetails(student);

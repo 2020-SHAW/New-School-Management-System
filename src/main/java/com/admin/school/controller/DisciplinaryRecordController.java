@@ -1,4 +1,3 @@
-// src/main/java/com/admin/school/controller/DisciplinaryRecordController.java
 package com.admin.school.controller;
 
 import com.admin.school.entity.DisciplinaryRecord;
@@ -35,8 +34,18 @@ public class DisciplinaryRecordController {
     // POST - create a new disciplinary record
     @PostMapping
     public ResponseEntity<DisciplinaryRecord> createDisciplinaryRecord(@RequestBody DisciplinaryRecord disciplinaryRecord) {
+        // Convert the student ID to Long (since StudentService uses Long)
+        String studentIdString = disciplinaryRecord.getStudent().getId(); // Student ID as String
+        String studentId = null;
+
+        try {
+            studentId = studentIdString; // Convert the String ID to Long
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Return a bad request if the ID is not a valid number
+        }
+
         // Validate that the student exists before saving the record
-        Optional<Student> student = studentService.get(disciplinaryRecord.getStudent().getId());
+        Optional<Student> student = studentService.get(studentId);  // Pass the Long ID to the get method
         if (student.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                  .body(null); // Student not found, return 404
@@ -59,8 +68,18 @@ public class DisciplinaryRecordController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // If not found, return 404
         }
 
+        // Convert the student ID to Long (since StudentService uses Long)
+        String studentIdString = disciplinaryRecord.getStudent().getId(); // Student ID as String
+        String studentId = null;
+
+        try {
+            studentId = studentIdString; // Convert the String ID to Long
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Return a bad request if the ID is not a valid number
+        }
+
         // Check if the student exists before updating
-        Optional<Student> student = studentService.get(disciplinaryRecord.getStudent().getId());
+        Optional<Student> student = studentService.get(studentId);  // Pass the Long ID to the get method
         if (student.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                  .body(null); // If student doesn't exist, return 404

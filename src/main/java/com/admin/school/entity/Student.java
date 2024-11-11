@@ -1,16 +1,20 @@
 package com.admin.school.entity;
 
+import com.admin.school.IDGenerator.CustomPrefixIdGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-generate the ID
-    private Long id;  // Primary Key
+    @GeneratedValue(generator = "custom-id-generator")
+    @GenericGenerator(name = "custom-id-generator", strategy = "com.admin.school.IDGenerator.CustomPrefixIdGenerator")
+    private String id;  // Primary Key
 
     private String firstName;
     private String lastName;
@@ -24,7 +28,6 @@ public class Student {
     private String enrollmentStatus;
     private String medicalCondition;
 
-    // New field for number of siblings
     private Integer numberOfSiblings;
 
     @ManyToOne
@@ -50,11 +53,11 @@ public class Student {
     private PerformanceAssessment performanceAssessment;
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
