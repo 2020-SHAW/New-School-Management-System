@@ -5,6 +5,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.FetchType;
 
 import java.util.List;
 
@@ -21,7 +25,9 @@ public class Class {
     @ManyToMany(mappedBy = "assignedClass")
     private List<Student> students;
 
-    // Class teacher (One-to-One relationship if needed)
+    // Updated: One-to-One relationship with Teacher
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_teacher_id") // Column to store the teacher's ID
     private Teacher classTeacher;
 
     // Getters and Setters

@@ -9,12 +9,20 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.Menu;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import jakarta.annotation.security.RolesAllowed;
+
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 @Route("class-view") // This is the URL to access this view
+@PageTitle("Class View")
+@Menu(order = 14, icon = "line-awesome/svg/credit-card.svg")
+@RolesAllowed("ADMIN")
 public class ClassView extends VerticalLayout {
 
     private final ClassService classService;
