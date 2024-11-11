@@ -1,4 +1,3 @@
-// src/main/java/com/admin/school/services/ClassService.java
 package com.admin.school.services;
 
 import com.admin.school.entity.Class;
@@ -63,5 +62,10 @@ public class ClassService {
     // Filter classes by name
     public List<Class> filterByName(String name) {
         return repository.findByNameContainingIgnoreCase(name);
+    }
+
+    // Check if a class exists by name and grade
+    public boolean existsByNameAndGrade(String name, String grade) {
+        return repository.existsByNameAndGrade(name, grade);
     }
 }

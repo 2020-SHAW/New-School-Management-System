@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ClassRepository extends JpaRepository<com.admin.school.entity.Class, Long>, JpaSpecificationExecutor<com.admin.school.entity.Class> {
 	List<Class> findByNameContainingIgnoreCase(String name);
+    boolean existsByNameAndGrade(String name, String grade);
+    
 }

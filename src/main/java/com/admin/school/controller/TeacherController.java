@@ -2,6 +2,8 @@ package com.admin.school.controller;
 
 import com.admin.school.entity.Teacher;
 import com.admin.school.services.TeacherService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +21,10 @@ public class TeacherController {
         this.teacherService = teacherService;
     }
 
-    // GET all teachers (pagination can be handled via Pageable in the service)
+    // GET all teachers (pagination handled by Pageable)
     @GetMapping
-    public ResponseEntity<Iterable<Teacher>> getAllTeachers() {
-        Iterable<Teacher> teachers = teacherService.getAllTeachers();
+    public ResponseEntity<Page<Teacher>> getAllTeachers(Pageable pageable) {
+        Page<Teacher> teachers = teacherService.listTeachers(pageable); // Using pageable
         return new ResponseEntity<>(teachers, HttpStatus.OK);
     }
 
