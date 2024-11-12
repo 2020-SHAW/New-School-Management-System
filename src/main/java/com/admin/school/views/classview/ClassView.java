@@ -1,110 +1,232 @@
 package com.admin.school.views.classview;
 
 import com.admin.school.entity.Class;
-import com.admin.school.entity.Teacher;
 import com.admin.school.services.ClassService;
-import com.admin.school.services.TeacherService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.dependency.Uses;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.Menu;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
+import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.security.RolesAllowed;
-
 import org.springframework.data.domain.PageRequest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-import java.util.List;
+import java.util.Optional;
 
-@Route("class-view") // This is the URL to access this view
 @PageTitle("Class View")
-@Menu(order = 14, icon = "line-awesome/svg/credit-card.svg")
+@Route("class-view/:classID?/:action?(edit)")
 @RolesAllowed("ADMIN")
-public class ClassView extends VerticalLayout {
+@Uses(Icon.class)
+public class ClassView extends Div implements BeforeEnterObserver {
 
-    private final ClassService classService;
-    private final TeacherService teacherService;
+    private static final String CLASS_ID = "classID";
+    private static final String CLASS_EDIT_ROUTE_TEMPLATE = "class-view/%s/edit";
 
-    private Grid<Class> classGrid;
-    private ComboBox<Teacher> teacherComboBox; // ComboBox for selecting a teacher
+    private final Grid<Class> grid = new Grid<>(Class.class, false);
+    private TextField nameField;
+    private TextField gradeField;
+    private Checkbox isActiveField;
     private TextField searchField;
-    private Button addClassButton;
+    private Button searchButton;
 
-    public ClassView(ClassService classService, TeacherService teacherService) {
+    private final Button cancel = new Button("Cancel");
+    private final Button save = new Button("Save");
+
+    private final BeanValidationBinder<Class> binder;
+    private Class selectedClass;
+    private final ClassService classService;
+
+    public ClassView(ClassService classService) {
         this.classService = classService;
-        this.teacherService = teacherService;
+        addClassNames("master-detail-view");
 
-        // Initialize the components
-        classGrid = new Grid<>(Class.class);
-        teacherComboBox = new ComboBox<>("Assign Teacher");
-        searchField = new TextField("Search Classes");
-        addClassButton = new Button("Add New Class");
+        // Create UI components
+        SplitLayout splitLayout = new SplitLayout();
+        createSearchField();
+        createSearchButton();
+        createGridLayout(splitLayout);
+        createEditorLayout(splitLayout);
 
-        // Layout setup
-        add(searchField, addClassButton, teacherComboBox, classGrid);
+        add(searchField, searchButton, splitLayout);
 
-        // Configure the grid to show class details
-        classGrid.setColumns("name", "grade"); // Show class name and grade
-        classGrid.addColumn(clazz -> clazz.getStudents() != null ? clazz.getStudents().size() : 0)
-                .setHeader("No. of Students");
+        // Configure Grid
+        grid.addColumn("name").setAutoWidth(true);
+        grid.addColumn("grade").setAutoWidth(true);
+        grid.addColumn(clazz -> clazz.getStudents() != null ? clazz.getStudents().size() : 0)
+                .setHeader("No. of Students").setAutoWidth(true);
 
-        // Event listener for search field to filter classes by name
-        searchField.addValueChangeListener(event -> filterClasses(event.getValue()));
+        // Add the column for active status with green/red dot using ComponentRenderer
+        grid.addColumn(new ComponentRenderer<>(clazz -> {
+            String dotColor = clazz.getIsActive() ? "green" : "red";
+            Div statusDot = new Div();
+            statusDot.getStyle().set("width", "10px")
+                    .set("height", "10px")
+                    .set("border-radius", "50%")
+                    .set("background-color", dotColor);
+            return statusDot;
+        })).setHeader("Status").setAutoWidth(true).setSortable(false);
 
-        // Event listener for adding new class
-        addClassButton.addClickListener(event -> showAddClassForm());
+        // Initially load grid
+        grid.setItems(query -> classService.list(
+                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        // Load available teachers into ComboBox
-        loadTeachers();
+        // When a row is selected or deselected, populate the form
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                UI.getCurrent().navigate(String.format(CLASS_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+            } else {
+                clearForm();
+                UI.getCurrent().navigate(ClassView.class);
+            }
+        });
 
-        // Assign a teacher to the selected class
-        teacherComboBox.addValueChangeListener(event -> assignTeacherToClass(event.getValue()));
+        // Binder setup for form validation
+        binder = new BeanValidationBinder<>(Class.class);
 
-        // Load classes into the grid
-        updateClassGrid();
+        // Explicitly bind fields here
+        binder.forField(nameField)
+              .bind(Class::getName, Class::setName);
+
+        binder.forField(gradeField)
+              .asRequired("Grade is required") // Make the Grade field required
+              .bind(Class::getGrade, Class::setGrade);
+
+        binder.forField(isActiveField)
+              .bind(Class::getIsActive, Class::setIsActive);
+
+        cancel.addClickListener(e -> {
+            clearForm();
+            refreshGrid();
+        });
+
+        save.addClickListener(e -> {
+            try {
+                if (this.selectedClass == null) {
+                    this.selectedClass = new Class(); // Prevent NullPointerException
+                }
+                binder.writeBean(this.selectedClass);
+                classService.save(this.selectedClass);
+                clearForm();
+                refreshGrid();
+                Notification.show("Data updated");
+                UI.getCurrent().navigate(ClassView.class);
+            } catch (ObjectOptimisticLockingFailureException exception) {
+                Notification n = Notification.show(
+                        "Error updating the data. Somebody else has updated the record while you were making changes.");
+                n.setPosition(Position.MIDDLE);
+                n.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            } catch (ValidationException validationException) {
+                Notification.show("Failed to update the data. Check again that all values are valid");
+            }
+        });
     }
 
-    // Load the available teachers into the ComboBox
-    private void loadTeachers() {
-        // Fetch all teachers with pagination
-        List<Teacher> teachers = teacherService.listTeachers(PageRequest.of(0, 10)).getContent();
-        teacherComboBox.setItems(teachers);
-
-        // Set item label generator to display teacher's full name
-        teacherComboBox.setItemLabelGenerator(Teacher::getFullName);
+    private void createSearchField() {
+        searchField = new TextField();
+        searchField.setPlaceholder("Search classes...");
+        searchField.setClearButtonVisible(true);
+        searchField.setWidthFull();
     }
 
-    // Filter classes based on the name entered in the search field
-    private void filterClasses(String name) {
-        // Filter classes by name using the ClassService
-        List<Class> filteredClasses = classService.filterByName(name);
-        classGrid.setItems(filteredClasses);
+    private void createSearchButton() {
+        searchButton = new Button("Search");
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.addClickListener(e -> {
+            filterClasses(searchField.getValue());  // Trigger search on button click
+        });
     }
 
-    // Method to update the grid with all classes from the service
-    private void updateClassGrid() {
-        // Fetch all classes from the ClassService and display them in the grid
-        List<Class> classes = classService.listAll();
-        classGrid.setItems(classes);
+    private void createEditorLayout(SplitLayout splitLayout) {
+        Div editorLayoutDiv = new Div();
+        editorLayoutDiv.setClassName("editor-layout");
+
+        Div editorDiv = new Div();
+        editorDiv.setClassName("editor");
+        editorLayoutDiv.add(editorDiv);
+
+        FormLayout formLayout = new FormLayout();
+        nameField = new TextField("Class Name");
+        gradeField = new TextField("Grade");
+        isActiveField = new Checkbox("Is Active");
+        formLayout.add(nameField, gradeField, isActiveField);
+
+        editorDiv.add(formLayout);
+        createButtonLayout(editorLayoutDiv);
+
+        splitLayout.addToSecondary(editorLayoutDiv);
     }
 
-    // Show the form to add a new class
-    private void showAddClassForm() {
-        // For now, we will log this and later replace it with the actual navigation or dialog
-        System.out.println("Navigate to form to add a class");
+    private void createButtonLayout(Div editorLayoutDiv) {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setClassName("button-layout");
+        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonLayout.add(save, cancel);
+        editorLayoutDiv.add(buttonLayout);
     }
 
-    // Assign a selected teacher to the selected class in the grid
-    private void assignTeacherToClass(Teacher teacher) {
-        if (teacher != null) {
-            // Get the currently selected class from the grid
-            Class selectedClass = classGrid.asSingleSelect().getValue();
-            if (selectedClass != null) {
-                selectedClass.setClassTeacher(teacher); // Assuming there's a setClassTeacher method
-                classService.save(selectedClass); // Persist the updated class with the assigned teacher
+    private void createGridLayout(SplitLayout splitLayout) {
+        Div wrapper = new Div();
+        wrapper.setClassName("grid-wrapper");
+        splitLayout.addToPrimary(wrapper);
+        wrapper.add(grid);
+    }
+
+    private void filterClasses(String searchTerm) {
+        grid.setItems(query -> classService.findBySearchTerm(searchTerm,
+                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                .stream());
+        grid.getDataProvider().refreshAll();  // Ensure grid refreshes
+    }
+
+    private void refreshGrid() {
+        grid.select(null);
+        grid.getDataProvider().refreshAll();
+    }
+
+    private void clearForm() {
+        populateForm(null);
+    }
+
+    private void populateForm(Class value) {
+        this.selectedClass = value;
+        binder.readBean(this.selectedClass);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        Optional<Long> classId = event.getRouteParameters().get(CLASS_ID).map(Long::parseLong);
+        if (classId.isPresent()) {
+            Optional<Class> classFromBackend = classService.get(classId.get());
+            if (classFromBackend.isPresent()) {
+                populateForm(classFromBackend.get());
+            } else {
+                Notification.show(
+                        String.format("The requested class was not found, ID = %s", classId.get()), 3000,
+                        Notification.Position.BOTTOM_START);
+                refreshGrid();
+                event.forwardTo(ClassView.class);
             }
         }
     }

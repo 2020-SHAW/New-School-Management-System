@@ -4,11 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 
 import java.util.List;
 
@@ -22,11 +21,14 @@ public class Class {
     private String name;
     private String grade;
 
-    @ManyToMany(mappedBy = "assignedClass")
+    private Boolean isActive; // New field to track if the class is active
+
+    // One-to-many relationship with Student. A class can have many students
+    @OneToMany(mappedBy = "assignedClass", fetch = FetchType.EAGER) // 'assignedClass' will be the reference in the Student entity
     private List<Student> students;
 
-    // Updated: One-to-One relationship with Teacher
-    @ManyToOne(fetch = FetchType.LAZY)
+    // Many-to-one relationship with Teacher. A class has one teacher (but it's now optional)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true) // Class can exist without a teacher
     @JoinColumn(name = "class_teacher_id") // Column to store the teacher's ID
     private Teacher classTeacher;
 
@@ -53,6 +55,14 @@ public class Class {
 
     public void setGrade(String grade) {
         this.grade = grade;
+    }
+
+    public Boolean getIsActive() {  // Getter for the isActive field
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {  // Setter for the isActive field
+        this.isActive = isActive;
     }
 
     public List<Student> getStudents() {

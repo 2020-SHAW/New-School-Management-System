@@ -59,7 +59,7 @@ public class ClassService {
         return repository.count();
     }
 
-    // Filter classes by name
+    // Filter classes by name (existing method)
     public List<Class> filterByName(String name) {
         return repository.findByNameContainingIgnoreCase(name);
     }
@@ -67,5 +67,16 @@ public class ClassService {
     // Check if a class exists by name and grade
     public boolean existsByNameAndGrade(String name, String grade) {
         return repository.existsByNameAndGrade(name, grade);
+    }
+
+    // Real-time search functionality by both name and grade (new method)
+    public Page<Class> findBySearchTerm(String searchTerm, Pageable pageable) {
+        Specification<Class> specification = (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.or(
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + searchTerm.toLowerCase() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("grade")), "%" + searchTerm.toLowerCase() + "%")
+            );
+        };
+        return repository.findAll(specification, pageable);
     }
 }
