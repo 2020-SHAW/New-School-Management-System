@@ -13,7 +13,7 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route(value = "login")
-@RouteAlias(value = "")  // This makes it the default landing page
+@RouteAlias(value = "")
 @AnonymousAllowed
 @PageTitle("Login")
 public class LoginView extends LoginOverlay implements BeforeEnterObserver {
@@ -35,12 +35,13 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        // Only redirect if already authenticated
         if (authenticatedUser.get().isPresent()) {
             setOpened(false);
-           
             event.forwardTo("student");
+        } else {
+            setOpened(true);
         }
-
         setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
     }
 }
