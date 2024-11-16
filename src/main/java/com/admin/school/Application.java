@@ -1,6 +1,7 @@
 package com.admin.school;
 
 import com.admin.school.data.SamplePersonRepository;
+import com.admin.school.repository.StudentRepository;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.Theme;
@@ -27,7 +28,7 @@ public class Application implements AppShellConfigurator {
     // Lazy load the SamplePersonRepository to avoid circular dependency
     @Bean
     public SqlDataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer(DataSource dataSource,
-            SqlInitializationProperties properties, @Lazy SamplePersonRepository repository) {
+            SqlInitializationProperties properties, @Lazy StudentRepository repository) {
         // This bean ensures the database is only initialized when empty
         return new SqlDataSourceScriptDatabaseInitializer(dataSource, properties) {
             @Override

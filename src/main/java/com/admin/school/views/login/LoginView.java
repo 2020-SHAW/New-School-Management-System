@@ -7,15 +7,16 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.internal.RouteUtil;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+@Route(value = "login")
+@RouteAlias(value = "")  // This makes it the default landing page
 @AnonymousAllowed
 @PageTitle("Login")
-@Route(value = "login")
 public class LoginView extends LoginOverlay implements BeforeEnterObserver {
-
     private final AuthenticatedUser authenticatedUser;
 
     public LoginView(AuthenticatedUser authenticatedUser) {
@@ -28,7 +29,6 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         i18n.getHeader().setDescription("Login using user/user or admin/admin");
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
-
         setForgotPasswordButtonVisible(false);
         setOpened(true);
     }
@@ -36,9 +36,9 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         if (authenticatedUser.get().isPresent()) {
-            // Already logged in
             setOpened(false);
-            event.forwardTo("");
+           
+            event.forwardTo("student");
         }
 
         setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));

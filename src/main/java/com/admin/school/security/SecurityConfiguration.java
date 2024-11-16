@@ -21,16 +21,23 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        http.authorizeHttpRequests(
-                authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll());
-
-        // Icons from the line-awesome addon
+        // Public resources
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll());
+        
+        // Line-awesome icons
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(new AntPathRequestMatcher("/line-awesome/**/*.svg")).permitAll());
 
+        // Allow access to the login page
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(new AntPathRequestMatcher("/")).permitAll());
+
         super.configure(http);
         setLoginView(http, LoginView.class);
-    }
 
+        // Configure login processing URL if needed
+        http.formLogin(form -> form
+                .loginPage("/").permitAll());
+    }
 }
