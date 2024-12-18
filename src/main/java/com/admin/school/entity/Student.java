@@ -1,12 +1,10 @@
 package com.admin.school.entity;
 
-import com.admin.school.IDGenerator.CustomPrefixIdGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import org.hibernate.annotations.GenericGenerator;
 import java.time.LocalDate;
 import java.util.List;
-
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Student {
@@ -52,7 +50,21 @@ public class Student {
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private PerformanceAssessment performanceAssessment;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Health> healthRecords; // List of health records for the student
+
+    private boolean isActive = true; // Field to track if the student is active or inactive
+
+    // Relationship with Finance
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Finance finance;  // This assumes the student has a one-to-one relationship with finance
+
     // Getters and Setters
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
     public String getId() {
         return id;
     }
@@ -171,5 +183,29 @@ public class Student {
 
     public void setPerformanceAssessment(PerformanceAssessment performanceAssessment) {
         this.performanceAssessment = performanceAssessment;
+    }
+
+    public List<Health> getHealthRecords() {
+        return healthRecords;
+    }
+
+    public void setHealthRecords(List<Health> healthRecords) {
+        this.healthRecords = healthRecords;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public Finance getFinance() {
+        return finance;
+    }
+
+    public void setFinance(Finance finance) {
+        this.finance = finance;
     }
 }

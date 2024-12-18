@@ -2,6 +2,7 @@
 package com.admin.school.services;
 
 import com.admin.school.entity.Finance;
+import com.admin.school.entity.Student;
 import com.admin.school.repository.FinanceRepository;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,13 @@ public class FinanceService {
     // List all finance records
     public List<Finance> listAll() {
         return repository.findAll();  // Retrieves all finance records from the database
+    }
+
+    public Finance getFinanceByStudent(Student student) {
+        return repository.findByStudent(student);
+    }
+
+    public void saveFinance(Finance finance) {
+        repository.save(finance);
     }
 }

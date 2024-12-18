@@ -1,20 +1,14 @@
 package com.admin.school.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.GenericGenerator;
-
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Column;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.JoinColumn;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 @Entity
 public class Teacher {
@@ -57,6 +51,17 @@ public class Teacher {
 
     private String photoPath; // Path to image file (e.g., PNG, JPG)
     private String resumePath; // Path to resume file (e.g., DOCX, PDF)
+
+    // One-to-many relationship with health records
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Health> healthRecords; // List of health records for the teacher
+
+    private boolean isBlacklisted = false; // Field to track if the teacher is blacklisted
+
+    // Method to blacklist the teacher upon expulsion
+    public void blacklist() {
+        this.isBlacklisted = true;
+    }
 
     // Getters and setters
 
@@ -164,7 +169,19 @@ public class Teacher {
         this.resumePath = resumePath;
     }
 
-    public String getFullName() {
-        return firstName + " " + (middleName != null ? middleName + " " : "") + lastName;
+    public List<Health> getHealthRecords() {
+        return healthRecords;
+    }
+
+    public void setHealthRecords(List<Health> healthRecords) {
+        this.healthRecords = healthRecords;
+    }
+
+    public boolean isBlacklisted() {
+        return isBlacklisted;
+    }
+
+    public void setBlacklisted(boolean blacklisted) {
+        isBlacklisted = blacklisted;
     }
 }

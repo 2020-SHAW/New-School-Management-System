@@ -24,7 +24,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
-@PageTitle("Image Gallery")
+@PageTitle("Teaching Staff")
 @Route("image-gallery")
 @Menu(order = 8, icon = "line-awesome/svg/th-list-solid.svg")
 @AnonymousAllowed
@@ -35,8 +35,8 @@ public class ImageGalleryView extends Main implements HasComponents, HasStyle {
     public ImageGalleryView() {
         constructUI();
 
-        imageContainer.add(new ImageGalleryViewCard("Snow mountains under stars",
-                "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
+        imageContainer.add(new ImageGalleryViewCard("Graham Kamau",
+                "https://images.unsplash.com/photo-1511629091441-ee46146481b6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 1170w"));
         imageContainer.add(new ImageGalleryViewCard("Snow covered mountain",
                 "https://images.unsplash.com/photo-1512273222628-4daea6e55abb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
         imageContainer.add(new ImageGalleryViewCard("River between mountains",

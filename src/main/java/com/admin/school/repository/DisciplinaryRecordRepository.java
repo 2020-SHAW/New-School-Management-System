@@ -1,10 +1,15 @@
-// src/main/java/com/management/school/data/DisciplinaryRecordRepository.java
 package com.admin.school.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import com.admin.school.entity.DisciplinaryRecord;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DisciplinaryRecordRepository extends JpaRepository<DisciplinaryRecord, Long>, JpaSpecificationExecutor<DisciplinaryRecord> {
+@Repository
+public interface DisciplinaryRecordRepository extends JpaRepository<DisciplinaryRecord, Long> {
+    
+    // Method to find disciplinary records by student ID
+    List<DisciplinaryRecord> findByStudentId(String studentId);
+
+	List<DisciplinaryRecord> findByTeacherId(String teacherId);
 }
