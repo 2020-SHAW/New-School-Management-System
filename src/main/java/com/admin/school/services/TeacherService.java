@@ -51,4 +51,9 @@ public class TeacherService {
     public long getTeacherCount() {
         return teacherRepository.count();
     }
+
+	public void saveTeacher(Teacher teacher) {
+		teacherRepository.save(teacher);
+		
+	}
 }

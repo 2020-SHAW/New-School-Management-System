@@ -45,9 +45,8 @@ public class Teacher {
 
     @ElementCollection
     @CollectionTable(name = "teacher_certifications", joinColumns = @JoinColumn(name = "teacher_id"))
-    @Lob
     @Column(name = "certification")
-    private Set<byte[]> certifications; // Store certifications as byte arrays
+    private Set<String> certifications; // Store certifications as String
 
     private String photoPath; // Path to image file (e.g., PNG, JPG)
     private String resumePath; // Path to resume file (e.g., DOCX, PDF)
@@ -57,6 +56,9 @@ public class Teacher {
     private List<Health> healthRecords; // List of health records for the teacher
 
     private boolean isBlacklisted = false; // Field to track if the teacher is blacklisted
+
+    private Integer numberOfChildren; // Number of children (only if maritalStatus is "Married")
+    private boolean hasKids; // Whether the teacher has kids (only if maritalStatus is "Married")
 
     // Method to blacklist the teacher upon expulsion
     public void blacklist() {
@@ -145,11 +147,11 @@ public class Teacher {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Set<byte[]> getCertifications() {
+    public Set<String> getCertifications() {
         return certifications;
     }
 
-    public void setCertifications(Set<byte[]> certifications) {
+    public void setCertifications(Set<String> certifications) {
         this.certifications = certifications;
     }
 
@@ -183,5 +185,21 @@ public class Teacher {
 
     public void setBlacklisted(boolean blacklisted) {
         isBlacklisted = blacklisted;
+    }
+
+    public Integer getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
+    public void setNumberOfChildren(Integer numberOfChildren) {
+        this.numberOfChildren = numberOfChildren;
+    }
+
+    public boolean isHasKids() {
+        return hasKids;
+    }
+
+    public void setHasKids(boolean hasKids) {
+        this.hasKids = hasKids;
     }
 }
