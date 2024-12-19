@@ -22,7 +22,10 @@ public class CustomPrefixIdGenerator implements IdentifierGenerator {
         } else if (object instanceof com.admin.school.entity.ParentGuardian) {
             prefix = "PG";
             entityName = "ParentGuardian";
-        }
+        } else if (object instanceof com.admin.school.entity.Staff) {
+        prefix = "FF";
+        entityName = "Staff";
+    }
 
         // Use a sequence to get the next ID. Dynamically choose the sequence name based on entity type.
         String sequenceName = entityName.toLowerCase() + "_seq";  // Example: "student_seq" or "teacher_seq"
